@@ -33,7 +33,7 @@ class SkypeDatabase
      */
     public function logsByUser($user)
     {
-        return $this->connection()->query("SELECT author,timestamp, body_xml FROM messages WHERE dialog_partner = '$user'")->fetchAll();
+        return $this->connection()->query("SELECT author, timestamp, body_xml, from_dispname FROM messages WHERE dialog_partner = '$user'")->fetchAll();
     }
 
     public function query($sql, $parameters)

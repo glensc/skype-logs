@@ -56,6 +56,7 @@ class ExportByUserCommand extends Command
             $row['date'] = date($format, $row['timestamp']);
             $row['body_xml'] = html_entity_decode($row['body_xml']);
             $row['body_short'] = substr($row['body_xml'], 0, 45);
+            $row['author'] = "{$row['from_dispname']} ({$row['author']})";
             if ( !empty($columns) )
                 $data[$index] = Arr::only($row, $columns);
             else
@@ -114,9 +115,9 @@ class ExportByUserCommand extends Command
      */
     private function toJson($output, $data, $destination)
     {
-        $data = $this->processResult($data);
+        $data = $this->processResult($data, ['author', 'body_xml', 'date']);
         $destination = $destination . '.json';
-        file_put_contents($destination, json_encode($data));
+        file_put_contents($destination, json_encode($data, JSON_PRETTY_PRINT));
         $output->writeln("<info>Done, file generated at '{$destination}'</info>");
     }
 
@@ -127,7 +128,7 @@ class ExportByUserCommand extends Command
      */
     private function toCsv($output, $data, $destination)
     {
-        $data = $this->processResult($data);
+        $data = $this->processResult($data, ['author', 'body_xml', 'date']);
         $destination = $destination . '.csv';
 
         $handle = fopen($destination, "w+");
