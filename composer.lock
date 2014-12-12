@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "779bf4eb091073cf0256a2848eb70f61",
+    "hash": "26c7501062d460194e6f249955a8a4bb",
     "packages": [
         {
             "name": "illuminate/support",
@@ -119,6 +119,7 @@
     "prefer-stable": false,
     "platform": {
         "ext-sqlite3": "*",
+        "ext-pdo": "*",
         "php": ">=5.3.2"
     },
     "platform-dev": []
