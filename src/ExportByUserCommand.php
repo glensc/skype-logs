@@ -20,8 +20,8 @@ class ExportByUserCommand extends Command
             ->setDescription("Exports logs from a given User")
             ->addArgument('your_user', InputArgument::REQUIRED, 'Username to fetch database logs')
             ->addArgument('other_user', InputArgument::REQUIRED, 'Username used to find the logs to export')
-            ->addOption('format', 'f', InputOption::VALUE_OPTIONAL, "Output format: json, text, screen", 'screen')
-            ->addOption('destination', 'd', InputOption::VALUE_OPTIONAL, "Destination folder for the output", '.')
+            ->addOption('format', 'f', InputOption::VALUE_OPTIONAL, "Output format: json, csv, screen", 'screen')
+            ->addOption('destination', 'd', InputOption::VALUE_OPTIONAL, "Destination folder for the output", './skype-log-<username>-<user>')
         ;
     }
 
@@ -35,7 +35,7 @@ class ExportByUserCommand extends Command
         $username = $input->getArgument('your_user');
         $user = $input->getArgument('other_user');
         $format = $input->getOption('format');
-        $destination = $input->getOption('destination');
+        $destination = $this->getDestination($input);
 
         $output->writeln("<info>Exporting logs to {$username}");
 
@@ -65,6 +65,13 @@ class ExportByUserCommand extends Command
         return $data;
     }
 
+    /**
+     * @param OutputInterface $output
+     * @param $username
+     * @param $user
+     * @param $format
+     * @param $destination
+     */
     private function outputByFormat(OutputInterface $output, $username, $user, $format, $destination)
     {
         $skypeDB = new SkypeDatabase(SkypeDatabase::constructPath($username));
@@ -76,8 +83,8 @@ class ExportByUserCommand extends Command
                 $this->toJson($output, $data, $destination);
                 break;
 
-            case "text":
-                $this->toText($output, $data, $destination);
+            case "csv":
+                $this->toCsv($output, $data, $destination);
                 break;
 
             default:
@@ -86,6 +93,10 @@ class ExportByUserCommand extends Command
 
     }
 
+    /**
+     * @param OutputInterface $output
+     * @param $data
+     */
     private function toScreen(OutputInterface $output, $data)
     {
         $result = $this->processResult($data, ['author', 'date', 'body_short']);
@@ -96,13 +107,51 @@ class ExportByUserCommand extends Command
             ->render();
     }
 
-    private function toJson($output, $data)
+    /**
+     * @param $output
+     * @param $data
+     * @param $destination
+     */
+    private function toJson($output, $data, $destination)
     {
-        $output->writeln("<info>Output to JSON not implemented</info>");
+        $data = $this->processResult($data);
+        $destination = $destination . '.json';
+        file_put_contents($destination, json_encode($data));
+        $output->writeln("<info>Done, file generated at '{$destination}'</info>");
     }
 
-    private function toText($output, $data)
+    /**
+     * @param $output
+     * @param $data
+     * @param $destination
+     */
+    private function toCsv($output, $data, $destination)
     {
-        $output->writeln("<info>Output to TEXT not implemented</info>");
+        $data = $this->processResult($data);
+        $destination = $destination . '.csv';
+
+        $handle = fopen($destination, "w+");
+        fputcsv($handle, array_keys(reset($data)), ',');
+
+        foreach($data as $row)
+        {
+            fputcsv($handle, $row, ',');
+        }
+        fclose($handle);
+
+        $output->writeln("<info>Done, file generated at '{$destination}'</info>");
+    }
+
+    /**
+     * @param InputInterface $input
+     * @return mixed
+     */
+    private function getDestination(InputInterface $input)
+    {
+        $destination = $input->getOption('destination');
+        $destination = str_replace("<username>", $input->getArgument('your_user'), $destination);
+        $destination = str_replace("<user>", $input->getArgument('other_user'), $destination);
+
+        return $destination;
     }
 }
