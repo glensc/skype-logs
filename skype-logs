@@ -1,0 +1,10 @@
+#!/usr/bin/env php
+
+<?php
+require 'vendor/autoload.php';
+use Acme\ExportByUserCommand;
+use Symfony\Component\Console\Application;
+
+$app = new Application("Skype Logs Utility", '1.0');
+$app->add(new ExportByUserCommand);
+$app->run();
