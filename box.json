@@ -1,0 +1,20 @@
+{ 
+    "chmod": "755",
+    "directories": [
+        "src"
+    ],
+    "files": [
+        "LICENSE"
+    ],
+    "finder": [
+        {
+            "name": "*.php",
+            "exclude": ["Tests"],
+            "in": "vendor"
+        }
+    ],
+    "git-version": "package_version",
+    "main": "skype-logs",
+    "output": "skype-logs.phar",
+    "stub": true
+}

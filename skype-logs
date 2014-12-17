@@ -5,6 +5,6 @@ require 'vendor/autoload.php';
 use Acme\ExportByUserCommand;
 use Symfony\Component\Console\Application;
 
-$app = new Application("Skype Logs Utility", '1.0');
+$app = new Application("Skype Logs Utility", '@package_version@');
 $app->add(new ExportByUserCommand);
 $app->run();
