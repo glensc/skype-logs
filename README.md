@@ -1,7 +1,7 @@
 skype-logs
 ==========
 
-Simple CLI Application (PHP) to extract mac sqlite lite logs from skype into csv, json or screen
+Simple CLI Application (PHP) to extract MAC OS (OSX) sqlite lite logs from skype into csv, json or screen.
 
 # Compile
 
