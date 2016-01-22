@@ -12,16 +12,16 @@ class SkypeDatabase
     private $databasePath;
 
     /**
-     * @param $databasePath
+     * @param string $databasePath
      */
     public function __construct($databasePath)
     {
+        $this->validatePath($databasePath);
         $this->databasePath = $databasePath;
-        $this->validatePath($this->databasePath);
     }
 
     /**
-     * @param $username
+     * @param string $username
      * @return string
      */
     public static function constructPath($username)
@@ -35,7 +35,9 @@ class SkypeDatabase
      */
     public function logsByUser($user)
     {
-        return $this->connection()->query("SELECT author, timestamp, body_xml, from_dispname FROM messages WHERE dialog_partner = '$user'")->fetchAll();
+        return $this->connection()->query(
+            "SELECT author, timestamp, body_xml, from_dispname FROM messages WHERE dialog_partner = '$user'"
+        )->fetchAll();
     }
 
     /**
@@ -47,7 +49,7 @@ class SkypeDatabase
     public function listChats($limit = null)
     {
         $sql = "
-        SELECT chatname, c.topic, c.participants, count(*) c FROM Messages m
+        SELECT chatname, c.topic, c.participants, min(m.timestamp) min_ts, max(m.timestamp) max_ts, count(*) c FROM Messages m
           LEFT JOIN Chats c ON c.name=m.chatname
         GROUP BY chatname
         ORDER BY c DESC

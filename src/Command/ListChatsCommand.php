@@ -43,12 +43,22 @@ class ListChatsCommand extends Command
         $result = $skypeDB->listChats($limit);
 
         $table = new Table($output);
-        $table->setHeaders(array('#', 'Chatname', 'Chat Title', 'Members', 'Messages'));
+        $table->setHeaders(array('#', 'Chatname', 'Chat Title', 'Members', 'First Message', 'Last Message', 'Messages'));
         $i = 1;
         foreach ($result as $row) {
-            list($chatname, $title, $members, $messages) = array_values($row);
-            $nmembers = count(explode(' ', $members));
-            $table->addRow(array($i++, $chatname, $this->trim($title), $nmembers, $messages));
+            list($chatname, $title, $members, $min_ts, $max_ts, $messages) = array_values($row);
+
+            $table->addRow(
+                array(
+                    $i++,
+                    $chatname,
+                    $this->trim($title),
+                    count(explode(' ', $members)),
+                    $this->formatTime($min_ts),
+                    $this->formatTime($max_ts),
+                    $messages,
+                )
+            );
         }
         $table->render();
     }
@@ -56,5 +66,10 @@ class ListChatsCommand extends Command
     private function trim($s, $length = 60)
     {
         return mb_substr($s, 0, $length);
+    }
+
+    private function formatTime($ts)
+    {
+        return strftime("%Y-%m-%d %H:%M:%S", $ts);
     }
 }
