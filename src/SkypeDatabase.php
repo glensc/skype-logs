@@ -38,10 +38,41 @@ class SkypeDatabase
         return $this->connection()->query("SELECT author, timestamp, body_xml, from_dispname FROM messages WHERE dialog_partner = '$user'")->fetchAll();
     }
 
-    public function query($sql, $parameters)
+    /**
+     * Return statement for iterating over chats
+     *
+     * @param int $limit limit number of rows returned
+     * @return \PDOStatement
+     */
+    public function listChats($limit = null)
     {
-        $parameters = is_array($parameters) ? $parameters : [$parameters];
-        return $this->connection()->prepare($sql)->execute($parameters)->fetchAll();
+        $sql = "
+        SELECT chatname, c.topic, c.participants, count(*) c FROM Messages m
+          LEFT JOIN Chats c ON c.name=m.chatname
+        GROUP BY chatname
+        ORDER BY c DESC
+        ";
+
+        if ($limit > 0) {
+            $sql .= " LIMIT ".(int)$limit;
+        }
+
+        return $this->query($sql);
+    }
+
+    /**
+     * Run query, return statement object
+     *
+     * @param string $sql
+     * @param array|null $parameters
+     * @return \PDOStatement
+     */
+    public function query($sql, $parameters = null)
+    {
+        $st = $this->connection()->prepare($sql);
+        $st->execute($parameters);
+
+        return $st;
     }
 
     /**
