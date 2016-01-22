@@ -2,7 +2,6 @@
 
 namespace Acme\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -61,15 +60,5 @@ class ListChatsCommand extends Command
             );
         }
         $table->render();
-    }
-
-    private function trim($s, $length = 60)
-    {
-        return mb_substr($s, 0, $length);
-    }
-
-    private function formatTime($ts)
-    {
-        return strftime("%Y-%m-%d %H:%M:%S", $ts);
     }
 }
