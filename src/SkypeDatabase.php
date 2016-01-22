@@ -1,4 +1,6 @@
-<?php namespace Acme;
+<?php
+
+namespace Acme;
 
 use PDO;
 
@@ -12,7 +14,7 @@ class SkypeDatabase
     /**
      * @param $databasePath
      */
-    function __construct($databasePath)
+    public function __construct($databasePath)
     {
         $this->databasePath = $databasePath;
         $this->validatePath($this->databasePath);
@@ -28,7 +30,7 @@ class SkypeDatabase
     }
 
     /**
-     * @param $user
+     * @param string $user
      * @return \SQLite3Result
      */
     public function logsByUser($user)
@@ -56,15 +58,17 @@ class SkypeDatabase
 
     /**
      * Validate if database could be accessed
+     *
      * @param $databasePath
      */
     private function validatePath($databasePath)
     {
-        if (! file_exists($databasePath))
+        if (!file_exists($databasePath)) {
             throw new \InvalidArgumentException("Skype Database path '{$databasePath}' is not valid");
+        }
 
-        if (! is_readable($databasePath))
+        if (!is_readable($databasePath)) {
             throw new \InvalidArgumentException("Skype Database path '{$databasePath}' is not readable");
+        }
     }
-
 }
