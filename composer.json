@@ -16,7 +16,7 @@
         "phar": "php -d phar.readonly=0 $(which box.phar || which box) build -v"
     },
     "config": {
-		"prefer-lowest": true,
+        "prefer-lowest": true,
         "platform": {
             "php": "5.4"
         }
@@ -30,7 +30,7 @@
         "symfony/console": "~2.6",
         "ext-sqlite3": "*",
         "ext-pdo": "*",
-        "php": ">=5.4",
+        "php": ">=5.5",
         "illuminate/support": "~4.2"
     },
     "require-dev": {
