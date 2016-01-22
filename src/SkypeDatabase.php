@@ -21,15 +21,6 @@ class SkypeDatabase
     }
 
     /**
-     * @param string $username
-     * @return string
-     */
-    public static function constructPath($username)
-    {
-        return $_SERVER['HOME']. "/Library/Application Support/Skype/$username/main.db";
-    }
-
-    /**
      * @param string $user
      * @return \SQLite3Result
      */
