@@ -8,4 +8,5 @@ use Symfony\Component\Console\Application;
 
 $app = new Application("Skype Logs Utility", '@package_version@');
 $app->add(new Command\ExportByUserCommand());
+$app->add(new Command\ListChatsCommand());
 $app->run();
