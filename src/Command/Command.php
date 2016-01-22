@@ -9,6 +9,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Command extends BaseCommand
 {
+    // encoding used for messages. always utf-8
+    const ENCODING = 'UTF-8';
+
     /**
      * @var InputInterface
      */

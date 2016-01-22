@@ -54,6 +54,25 @@ class SkypeDatabase
     }
 
     /**
+     * Return messages for $chatname
+     *
+     * @param string $chatname name of Skype chat
+     * @return \PDOStatement
+     */
+    public function getMessagesByChat($chatname)
+    {
+        $sql = "
+            SELECT timestamp, chatname, author, body_xml
+            FROM messages
+            WHERE
+            chatname=? AND body_xml IS NOT NULL
+            ORDER BY timestamp ASC;
+           ";
+
+        return $this->query($sql, array($chatname));
+    }
+
+    /**
      * Run query, return statement object
      *
      * @param string $sql
