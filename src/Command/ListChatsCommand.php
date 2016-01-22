@@ -6,7 +6,6 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Acme\SkypeDatabase;
 
 class ListChatsCommand extends Command
 {
@@ -26,6 +25,12 @@ class ListChatsCommand extends Command
                 "Set limit of items displayed, use -1 to show all",
                 self::DEFAULT_LIMIT
             )
+            ->addOption(
+                'db-path',
+                null,
+                InputOption::VALUE_REQUIRED,
+                "Set path to Skype database, f.e /Library/Application Support/Skype/USERNAME/main.db"
+            )
             ->setDescription("Lists Skype chats");
     }
 
@@ -36,10 +41,8 @@ class ListChatsCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $skypeDB = new SkypeDatabase(SkypeDatabase::constructPath('glen'));
-
         $limit = $input->getOption('limit');
-        $result = $skypeDB->listChats($limit);
+        $result = $this->getSkypeDb()->listChats($limit);
 
         $table = new Table($output);
         $table->setHeaders(array('#', 'Chatname', 'Chat Title', 'Members', 'First Message', 'Last Message', 'Messages'));
