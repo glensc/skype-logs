@@ -1,4 +1,6 @@
-<?php namespace Acme;
+<?php
+
+namespace Acme\Command;
 
 use Illuminate\Support\Arr;
 use Symfony\Component\Console\Command\Command;
@@ -7,10 +9,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Acme\SkypeDatabase;
 
 class ExportByUserCommand extends Command
 {
-
     /**
      *
      */
@@ -51,16 +53,16 @@ class ExportByUserCommand extends Command
     {
         $format = "Y-m-d H:i:s";
 
-        foreach($data as $index => $row)
-        {
+        foreach ($data as $index => $row) {
             $row['date'] = date($format, $row['timestamp']);
             $row['body_xml'] = html_entity_decode($row['body_xml']);
             $row['body_short'] = substr($row['body_xml'], 0, 45);
             $row['author'] = "{$row['from_dispname']} ({$row['author']})";
-            if ( !empty($columns) )
+            if (!empty($columns)) {
                 $data[$index] = Arr::only($row, $columns);
-            else
+            } else {
                 $data[$index] = $row;
+            }
         }
 
         return $data;
@@ -78,8 +80,7 @@ class ExportByUserCommand extends Command
         $skypeDB = new SkypeDatabase(SkypeDatabase::constructPath($username));
         $data = $skypeDB->logsByUser($user);
 
-        switch($format)
-        {
+        switch ($format) {
             case "json":
                 $this->toJson($output, $data, $destination);
                 break;
@@ -103,7 +104,7 @@ class ExportByUserCommand extends Command
         $result = $this->processResult($data, ['author', 'date', 'body_short']);
         $table = new Table($output);
 
-        $table->setHeaders(['Author','Date', 'Body'])
+        $table->setHeaders(['Author', 'Date', 'Body'])
             ->setRows($result)
             ->render();
     }
@@ -116,7 +117,7 @@ class ExportByUserCommand extends Command
     private function toJson($output, $data, $destination)
     {
         $data = $this->processResult($data, ['author', 'body_xml', 'date']);
-        $destination = $destination . '.json';
+        $destination = $destination.'.json';
         file_put_contents($destination, json_encode($data, JSON_PRETTY_PRINT));
         $output->writeln("<info>Done, file generated at '{$destination}'</info>");
     }
@@ -129,13 +130,12 @@ class ExportByUserCommand extends Command
     private function toCsv($output, $data, $destination)
     {
         $data = $this->processResult($data, ['author', 'body_xml', 'date']);
-        $destination = $destination . '.csv';
+        $destination = $destination.'.csv';
 
         $handle = fopen($destination, "w+");
         fputcsv($handle, array_keys(reset($data)), ',');
 
-        foreach($data as $row)
-        {
+        foreach ($data as $row) {
             fputcsv($handle, $row, ',');
         }
         fclose($handle);
