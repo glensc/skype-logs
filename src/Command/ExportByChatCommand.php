@@ -32,6 +32,12 @@ class ExportByChatCommand extends Command
                 "Set name of channel in output"
             )
             ->addOption(
+                'usermap',
+                null,
+                InputOption::VALUE_REQUIRED,
+                "username mapping"
+            )
+            ->addOption(
                 'limit',
                 'l',
                 InputOption::VALUE_REQUIRED,
@@ -74,15 +80,42 @@ class ExportByChatCommand extends Command
     private function filterResults($res)
     {
         $name = $this->input->getOption('name');
+        $usermap = $this->getUsermap();
+
         foreach ($res as $row) {
             $value = array(
                 $row['timestamp'],
                 $name ?: $row['chatname'],
-                $row['author'],
+                isset($usermap[$row['author']]) ? $usermap[$row['author']] : $row['author'],
                 $this->formatMessage($row['body_xml']),
             );
             yield $value;
         }
+    }
+
+    /**
+     * Return username mapping
+     *
+     * @return array
+     */
+    private function getUsermap()
+    {
+        if (!$this->input->hasOption('usermap')) {
+            return null;
+        }
+
+        $filename = $this->input->getOption('usermap');
+        if (!is_readable($filename)) {
+            throw new \InvalidArgumentException("$filename is not readable");
+        }
+        $users = array();
+        $lines = file($filename);
+        foreach ($lines as $line) {
+            list($source, $target) = explode(':', trim($line));
+            $users[$source] = $target;
+        }
+
+        return $users;
     }
 
     /**
