@@ -34,14 +34,24 @@ class SkypeDatabase
     /**
      * Return statement for iterating over chats
      *
+     * @param string $title Match string part of chat title
      * @param int $limit limit number of rows returned
      * @return \PDOStatement
      */
-    public function listChats($limit = null)
+    public function listChats($title = null, $limit = null)
     {
+        $params = array();
         $sql = "
         SELECT chatname, c.topic, c.participants, min(m.timestamp) min_ts, max(m.timestamp) max_ts, count(*) c FROM Messages m
           LEFT JOIN Chats c ON c.name=m.chatname
+        ";
+
+        if ($title) {
+            $sql .= " WHERE c.topic LIKE ?";
+            $params[] = "%". str_replace("*", "%", $title). "%";
+        }
+
+        $sql .= "
         GROUP BY chatname
         ORDER BY c DESC
         ";

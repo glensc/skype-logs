@@ -26,6 +26,12 @@ class ListChatsCommand extends Command
                 self::DEFAULT_LIMIT
             )
             ->addOption(
+                'title',
+                null,
+                InputOption::VALUE_REQUIRED,
+                "Match string part of chat title using glob match"
+            )
+            ->addOption(
                 'db-path',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -42,7 +48,8 @@ class ListChatsCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $limit = $input->getOption('limit');
-        $result = $this->getSkypeDb()->listChats($limit);
+        $title = $input->getOption('title');
+        $result = $this->getSkypeDb()->listChats($title, $limit);
 
         $table = new Table($output);
         $table->setHeaders(array('#', 'Chatname', 'Chat Title', 'Members', 'First Message', 'Last Message', 'Messages'));
