@@ -7,6 +7,16 @@ use PDO;
 class SkypeDatabase
 {
     /**
+     * Chat type constants
+     * @see https://github.com/suurjaak/Skyperious/blob/v3.5/skyperious/skypedata.py#L61-L83
+     */
+    // Changed chat topic or picture
+    const MESSAGE_TYPE_TOPIC = 2;
+
+    // Ordinary message
+    const MESSAGE_TYPE_MESSAGE = 61;
+
+    /**
      * @var string
      */
     private $databasePath;
@@ -80,7 +90,7 @@ class SkypeDatabase
     public function getMessagesByChat($chatname)
     {
         $sql = "
-            SELECT timestamp, chatname, author, body_xml
+            SELECT timestamp, type, chatname, author, body_xml
             FROM messages
             WHERE
             chatname=? AND body_xml IS NOT NULL

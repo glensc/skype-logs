@@ -2,6 +2,7 @@
 
 namespace Acme\Command;
 
+use Acme\SkypeDatabase;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -83,11 +84,18 @@ class ExportByChatCommand extends Command
         $usermap = $this->getUsermap();
 
         foreach ($res as $row) {
+            $message = $this->formatMessage($row['body_xml']);
+            // skip topic changes
+            if ($row['type'] == SkypeDatabase::MESSAGE_TYPE_TOPIC) {
+                $this->output->writeln("Skipping message type {$row['type']}: {$message}");
+                continue;
+            }
+
             $value = array(
                 $row['timestamp'],
                 $name ?: $row['chatname'],
                 isset($usermap[$row['author']]) ? $usermap[$row['author']] : $row['author'],
-                $this->formatMessage($row['body_xml']),
+                $message,
             );
             yield $value;
         }
