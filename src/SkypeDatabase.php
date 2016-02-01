@@ -42,25 +42,33 @@ class SkypeDatabase
     {
         $params = array();
         $sql = "
-        SELECT chatname, c.topic, c.participants, min(m.timestamp) min_ts, max(m.timestamp) max_ts, count(*) c FROM Messages m
-          LEFT JOIN Chats c ON c.name=m.chatname
+        SELECT chatname,
+          c.displayname,
+          ch.topic, ch.participants,
+          min(m.timestamp) min_ts, max(m.timestamp) max_ts,
+          count(*) messages FROM Messages m
+        LEFT JOIN Conversations c ON c.identity=m.chatname
+        LEFT JOIN Chats ch ON ch.name=m.chatname
         ";
 
+
         if ($title) {
-            $sql .= " WHERE c.topic LIKE ?";
-            $params[] = "%". str_replace("*", "%", $title). "%";
+            $sql .= " WHERE ch.topic LIKE ? OR c.displayname LIKE ?";
+            $like = '%'.str_replace('*', '%', $title).'%';
+            $params[] = $like;
+            $params[] = $like;
         }
 
         $sql .= "
         GROUP BY chatname
-        ORDER BY c DESC
+        ORDER BY messages DESC
         ";
 
         if ($limit > 0) {
             $sql .= " LIMIT ".(int)$limit;
         }
 
-        return $this->query($sql);
+        return $this->query($sql, $params);
     }
 
     /**

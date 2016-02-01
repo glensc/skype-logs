@@ -55,17 +55,18 @@ class ListChatsCommand extends Command
         $table->setHeaders(array('#', 'Chatname', 'Chat Title', 'Members', 'First Message', 'Last Message', 'Messages'));
         $i = 1;
         foreach ($result as $row) {
-            list($chatname, $title, $members, $min_ts, $max_ts, $messages) = array_values($row);
+            $title = $this->trim($row['topic'] ?: $row['displayname']);
+            $nmembers = $row['participants'] !== null ? count(explode(' ', $row['members'])) : '?';
 
             $table->addRow(
                 array(
                     $i++,
-                    $chatname,
-                    $this->trim($title),
-                    count(explode(' ', $members)),
-                    $this->formatTime($min_ts),
-                    $this->formatTime($max_ts),
-                    $messages,
+                    $row['chatname'],
+                    $title,
+                    $nmembers,
+                    $this->formatTime($row['min_ts']),
+                    $this->formatTime($row['max_ts']),
+                    $row['messages'],
                 )
             );
         }
