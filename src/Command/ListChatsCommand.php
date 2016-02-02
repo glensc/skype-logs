@@ -56,7 +56,7 @@ class ListChatsCommand extends Command
         $i = 1;
         foreach ($result as $row) {
             $title = $this->trim($row['topic'] ?: $row['displayname']);
-            $nmembers = $row['participants'] !== null ? count(explode(' ', $row['members'])) : '?';
+            $nmembers = $row['participants'] !== null ? count(explode(' ', $row['participants'])) : '?';
 
             $table->addRow(
                 array(
