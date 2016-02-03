@@ -1,13 +1,6 @@
 {
     "name": "edder/skype-logs",
     "description": "Exports Mac Skype Logs",
-    "require": {
-        "symfony/console": "~2.6",
-        "ext-sqlite3": "*",
-        "ext-pdo": "*",
-        "php": ">=5.4",
-        "illuminate/support": "~4.2"
-    },
     "license": "MIT",
     "authors": [
         {
@@ -15,9 +8,28 @@
             "email": "edder.rojas@gmail.com"
         }
     ],
+    "scripts": {
+        "phar": "box.phar build -v"
+    },
+    "config": {
+		"prefer-lowest": true,
+        "platform": {
+            "php": "5.4"
+        }
+    },
     "autoload": {
         "psr-4": {
             "Acme\\": "src"
         }
+    },
+    "require": {
+        "symfony/console": "~2.6",
+        "ext-sqlite3": "*",
+        "ext-pdo": "*",
+        "php": ">=5.4",
+        "illuminate/support": "~4.2"
+    },
+    "require-dev": {
+        "kherge/box": "~2.4"
     }
 }
