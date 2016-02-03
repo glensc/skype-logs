@@ -6,10 +6,14 @@
         {
             "name": "Edder Rojas",
             "email": "edder.rojas@gmail.com"
+        },
+        {
+            "name": "Elan Ruusamäe",
+            "email": "glen@pld-linux.org"
         }
     ],
     "scripts": {
-        "phar": "box.phar build -v"
+        "phar": "box build -v"
     },
     "config": {
 		"prefer-lowest": true,
