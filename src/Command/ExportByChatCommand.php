@@ -91,6 +91,12 @@ class ExportByChatCommand extends Command
                 continue;
             }
 
+            // skip system messages
+            if ($row['author'] == 'sys') {
+                $this->output->writeln("Skipping message type {$row['type']}: from {$row['author']}: {$message}");
+                continue;
+            }
+
             $value = array(
                 $row['timestamp'],
                 $name ?: $row['chatname'],
