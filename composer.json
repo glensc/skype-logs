@@ -28,7 +28,7 @@
     },
     "require": {
         "symfony/console": "~2.6",
-        "ext-sqlite3": "*",
+        "ext-pdo_sqlite": "*",
         "ext-pdo": "*",
         "php": ">=5.5",
         "illuminate/support": "~4.2"
