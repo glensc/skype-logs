@@ -114,11 +114,11 @@ class ExportByChatCommand extends Command
      */
     private function getUsermap()
     {
-        if (!$this->input->hasOption('usermap')) {
+        $filename = $this->input->getOption('usermap');
+        if (!$filename) {
             return null;
         }
 
-        $filename = $this->input->getOption('usermap');
         if (!is_readable($filename)) {
             throw new \InvalidArgumentException("$filename is not readable");
         }
