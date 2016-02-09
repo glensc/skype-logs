@@ -10,6 +10,15 @@
         {
             "name": "*.php",
             "exclude": ["Tests"],
+            "in": [
+                "vendor/composer",
+                "vendor/illuminate/support",
+                "vendor/symfony/console",
+                "vendor/symfony/polyfill-mbstring"
+            ]
+        },
+        {
+            "name": "autoload.php",
             "in": "vendor"
         }
     ],
