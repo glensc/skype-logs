@@ -13,7 +13,7 @@
         }
     ],
     "scripts": {
-        "phar": "box build -v"
+        "phar": "php -d phar.readonly=0 $(which box.phar || which box) build -v"
     },
     "config": {
 		"prefer-lowest": true,
