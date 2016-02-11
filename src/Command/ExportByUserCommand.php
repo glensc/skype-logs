@@ -1,7 +1,8 @@
-<?php namespace Acme;
+<?php
+
+namespace Acme\Command;
 
 use Illuminate\Support\Arr;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,19 +11,22 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ExportByUserCommand extends Command
 {
-
     /**
      *
      */
     public function configure()
     {
         $this->setName("export")
-            ->setDescription("Exports logs from a given User")
-            ->addArgument('your_user', InputArgument::REQUIRED, 'Username to fetch database logs')
-            ->addArgument('other_user', InputArgument::REQUIRED, 'Username used to find the logs to export')
+            ->addArgument('user', InputArgument::REQUIRED, 'Username used to find the logs to export')
             ->addOption('format', 'f', InputOption::VALUE_OPTIONAL, "Output format: json, csv, screen", 'screen')
-            ->addOption('destination', 'd', InputOption::VALUE_OPTIONAL, "Destination folder for the output", './skype-log-<username>-<user>')
-        ;
+            ->addOption('destination', 'd', InputOption::VALUE_OPTIONAL, "Destination folder for the output", './skype-log-<user>')
+            ->addOption(
+                'db-path',
+                null,
+                InputOption::VALUE_REQUIRED,
+                "Set path to Skype database, f.e /Library/Application Support/Skype/USERNAME/main.db"
+            )
+            ->setDescription("Exports logs from a given User");
     }
 
     /**
@@ -32,14 +36,13 @@ class ExportByUserCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $username = $input->getArgument('your_user');
-        $user = $input->getArgument('other_user');
+        $user = $input->getArgument('user');
         $format = $input->getOption('format');
         $destination = $this->getDestination($input);
 
-        $output->writeln("<info>Exporting logs to {$username}");
+        $output->writeln("<info>Exporting logs to {$destination}");
 
-        $this->outputByFormat($output, $username, $user, $format, $destination);
+        $this->outputByFormat($output, $user, $format, $destination);
     }
 
     /**
@@ -51,16 +54,16 @@ class ExportByUserCommand extends Command
     {
         $format = "Y-m-d H:i:s";
 
-        foreach($data as $index => $row)
-        {
+        foreach ($data as $index => $row) {
             $row['date'] = date($format, $row['timestamp']);
             $row['body_xml'] = html_entity_decode($row['body_xml']);
             $row['body_short'] = substr($row['body_xml'], 0, 45);
             $row['author'] = "{$row['from_dispname']} ({$row['author']})";
-            if ( !empty($columns) )
+            if (!empty($columns)) {
                 $data[$index] = Arr::only($row, $columns);
-            else
+            } else {
                 $data[$index] = $row;
+            }
         }
 
         return $data;
@@ -68,18 +71,15 @@ class ExportByUserCommand extends Command
 
     /**
      * @param OutputInterface $output
-     * @param $username
-     * @param $user
-     * @param $format
-     * @param $destination
+     * @param string $user
+     * @param string $format
+     * @param string $destination
      */
-    private function outputByFormat(OutputInterface $output, $username, $user, $format, $destination)
+    private function outputByFormat(OutputInterface $output, $user, $format, $destination)
     {
-        $skypeDB = new SkypeDatabase(SkypeDatabase::constructPath($username));
-        $data = $skypeDB->logsByUser($user);
+        $data = $this->getSkypeDb()->logsByUser($user);
 
-        switch($format)
-        {
+        switch ($format) {
             case "json":
                 $this->toJson($output, $data, $destination);
                 break;
@@ -103,39 +103,38 @@ class ExportByUserCommand extends Command
         $result = $this->processResult($data, ['author', 'date', 'body_short']);
         $table = new Table($output);
 
-        $table->setHeaders(['Author','Date', 'Body'])
+        $table->setHeaders(['Author', 'Date', 'Body'])
             ->setRows($result)
             ->render();
     }
 
     /**
-     * @param $output
+     * @param OutputInterface $output
      * @param $data
      * @param $destination
      */
-    private function toJson($output, $data, $destination)
+    private function toJson(OutputInterface $output, $data, $destination)
     {
         $data = $this->processResult($data, ['author', 'body_xml', 'date']);
-        $destination = $destination . '.json';
+        $destination = $destination.'.json';
         file_put_contents($destination, json_encode($data, JSON_PRETTY_PRINT));
         $output->writeln("<info>Done, file generated at '{$destination}'</info>");
     }
 
     /**
-     * @param $output
+     * @param OutputInterface $output
      * @param $data
      * @param $destination
      */
-    private function toCsv($output, $data, $destination)
+    private function toCsv(OutputInterface $output, $data, $destination)
     {
         $data = $this->processResult($data, ['author', 'body_xml', 'date']);
-        $destination = $destination . '.csv';
+        $destination = $destination.'.csv';
 
         $handle = fopen($destination, "w+");
         fputcsv($handle, array_keys(reset($data)), ',');
 
-        foreach($data as $row)
-        {
+        foreach ($data as $row) {
             fputcsv($handle, $row, ',');
         }
         fclose($handle);
@@ -150,8 +149,7 @@ class ExportByUserCommand extends Command
     private function getDestination(InputInterface $input)
     {
         $destination = $input->getOption('destination');
-        $destination = str_replace("<username>", $input->getArgument('your_user'), $destination);
-        $destination = str_replace("<user>", $input->getArgument('other_user'), $destination);
+        $destination = str_replace("<user>", $input->getArgument('user'), $destination);
 
         return $destination;
     }
