@@ -16,10 +16,7 @@
         "phar": "php -d phar.readonly=0 $(which box.phar || which box) build -v"
     },
     "config": {
-        "prefer-lowest": true,
-        "platform": {
-            "php": "5.4"
-        }
+        "prefer-lowest": true
     },
     "autoload": {
         "psr-4": {
