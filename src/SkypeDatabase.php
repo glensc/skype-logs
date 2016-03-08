@@ -15,6 +15,8 @@ class SkypeDatabase
 
     // Ordinary message
     const MESSAGE_TYPE_MESSAGE = 61;
+    // File transfer
+    const MESSAGE_TYPE_FILE = 68;
 
     /**
      * @var string
