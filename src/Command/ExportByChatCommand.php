@@ -179,6 +179,11 @@ class ExportByChatCommand extends Command
         // decode HTML("&gt;", "&apos;"-> ">", "'")
         $message = html_entity_decode($message, ENT_QUOTES | ENT_XML1, self::ENCODING);
 
+        // if message ends with backslash, add space to prevent it breaking csv
+        if ($message && $message[strlen($message) - 1] == '\\') {
+            $message .= ' ';
+        }
+
         return $message;
     }
 }
