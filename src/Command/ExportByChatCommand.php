@@ -83,9 +83,20 @@ class ExportByChatCommand extends Command
         $name = $this->input->getOption('name');
         $usermap = $this->getUsermap();
         // skip topic changes, file uploads
-        $skip_types = array(SkypeDatabase::MESSAGE_TYPE_TOPIC, SkypeDatabase::MESSAGE_TYPE_FILE);
+        $skip_types = array(
+            SkypeDatabase::MESSAGE_TYPE_TOPIC,
+            SkypeDatabase::MESSAGE_TYPE_FILE,
+            SkypeDatabase::MESSAGE_TYPE_CALL,
+            SkypeDatabase::MESSAGE_TYPE_CALL_END,
+        );
 
+        $types_seen = array();
         foreach ($res as $row) {
+            if (!isset($types_seen[$row['type']])) {
+                $types_seen[$row['type']] = 0;
+            }
+            $types_seen[$row['type']]++;
+
             $message = $this->formatMessage($row['body_xml']);
             if (in_array($row['type'], $skip_types)) {
                 $this->output->writeln("Skipping message type {$row['type']}: {$message}");
