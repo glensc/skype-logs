@@ -29,6 +29,11 @@ class SkypeDatabase
     private $databasePath;
 
     /**
+     * @var \PDO
+     */
+    private $pdo;
+
+    /**
      * @param string $databasePath
      */
     public function __construct($databasePath)
@@ -127,11 +132,15 @@ class SkypeDatabase
      */
     private function connection()
     {
-        $pdo = new PDO("sqlite:{$this->databasePath}");
-        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        if (!$this->pdo) {
+            $pdo = new PDO("sqlite:{$this->databasePath}");
+            $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        return $pdo;
+            $this->pdo = $pdo;
+        }
+
+        return $this->pdo;
     }
 
     /**
