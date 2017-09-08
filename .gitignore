@@ -1,4 +1,5 @@
 /.idea/
 /vendor/
 /skype-logs.phar
+/composer.lock
 .DS_Store*
