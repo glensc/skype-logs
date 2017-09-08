@@ -8,6 +8,7 @@ class SkypeDatabase
 {
     /**
      * Chat type constants
+     *
      * @see https://github.com/suurjaak/Skyperious/blob/v3.5/skyperious/skypedata.py#L61-L83
      */
     // Changed chat topic or picture
@@ -15,6 +16,12 @@ class SkypeDatabase
 
     // Ordinary message
     const MESSAGE_TYPE_MESSAGE = 61;
+    // File transfer
+    const MESSAGE_TYPE_FILE = 68;
+    // Started Skype call
+    const MESSAGE_TYPE_CALL = 30;
+    // Skype call ended
+    const MESSAGE_TYPE_CALL_END = 39;
 
     /**
      * @var string
